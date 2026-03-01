@@ -1,6 +1,6 @@
 import { ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
-import { theme } from './theme/theme';
+import { theme} from './theme/theme';
 import { useFlow } from './hooks/useFlow'; 
 import { IntroPortal } from './components/layout/IntroPortal';
 import { TimelineSection } from './components/layout/TimelineSection';
