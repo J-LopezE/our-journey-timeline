@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material/styles";
+import type {} from '@mui/lab/themeAugmentation';
 
 const colors = {
   rose: "#f43f5e",
@@ -32,6 +33,32 @@ export const theme = createTheme({
   components: {
     // 1. CONFIGURACIÓN GLOBAL DE BOTONES
     // Esto asegura que TODOS tus botones tengan la fuente y forma que quieres
+     MuiTimelineItem: {
+      styleOverrides: {
+       root: {
+          '&::before': {
+            // Esto elimina el espacio fantasma a la izquierda en móvil
+            '@media (max-width:600px)': {
+              display: 'none', 
+            },
+          },
+        },
+      },
+    },
+            
+              // 2. CONFIGURACIÓN DE LOS CONTENIDOS DE LA CARD
+
+            MuiTimelineContent: {
+      styleOverrides: {
+        root: {
+          '@media (max-width:600px)': {
+            paddingLeft: '16px', // Espacio consistente entre la línea y la card
+            paddingRight: '0px',
+          },
+        },
+      },
+    },
+  
     MuiButton: {
       styleOverrides: {
         root: {
@@ -44,6 +71,8 @@ export const theme = createTheme({
         },
       },
     },
+   
+
     MuiCssBaseline: {
       styleOverrides: {
         body: {

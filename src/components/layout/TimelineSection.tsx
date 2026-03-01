@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Typography, Skeleton } from '@mui/material';
+import { Container, Typography, Skeleton, useMediaQuery, useTheme } from '@mui/material';
 import {
     Timeline,
     TimelineItem,
@@ -9,6 +9,7 @@ import {
     TimelineDot,
     TimelineOppositeContent,
 } from '@mui/lab';
+import type { TimelineProps } from '@mui/lab';
 import { motion } from 'framer-motion';
 import { MomentCard } from '../moments/MomentCard';
 import { myMoments } from '../../data/momentsData';
@@ -18,11 +19,17 @@ import { MomentSkeleton } from '../moments/MomentSkeleton';
 
 export const TimelineSection = () => {
     const [isLoading, setIsLoading] = useState(true);
+    // 2. CONFIGURAR HOOKS DE TEMA Y MEDIA QUERY
+    const theme = useTheme();
+    // Esto será true si la pantalla es menor a 600px (sm)
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     useEffect(() => {
         // Simulamos un pequeño delay para que el usuario vea la elegancia del Skeleton
         const timer = setTimeout(() => setIsLoading(false), 1500);
         return () => clearTimeout(timer);
     }, []);
+
+    const timelinePos: TimelineProps['position'] = isMobile ? "left" : "alternate";
 
     return (
         <Container maxWidth="md">
@@ -45,12 +52,14 @@ export const TimelineSection = () => {
                         Un viaje a través de mis recuerdos favoritos
                     </Typography>
 
-                    <Timeline position="alternate" sx={{ p: 0 }}>
+                    <Timeline position={timelinePos} sx={{ p: 0 }}>
                         {myMoments.map((moment, index) => (
                             <TimelineItem key={moment.id}>
-                                <TimelineOppositeContent sx={{ m: 'auto 0', fontWeight: 700, color: 'text.secondary' }}>
-                                    {isLoading ? <Skeleton width={60} /> : moment.date}
-                                </TimelineOppositeContent>
+                                {!isMobile && (
+                                    <TimelineOppositeContent sx={{ m: 'auto 0', fontWeight: 700, color: 'text.secondary' }}>
+                                        {isLoading ? <Skeleton width={60} /> : moment.date}
+                                    </TimelineOppositeContent>
+                                )}
                                 <TimelineSeparator>
                                     <TimelineDot sx={{ bgcolor: index === myMoments.length - 1 ? '#f43f5e' : '#6366f1', boxShadow: index === myMoments.length - 1 ? '0 0 0 4px rgba(244, 63, 94, 0.2)' : 'none' }}>
                                         {index === myMoments.length - 1 ? '❤️' : null}
