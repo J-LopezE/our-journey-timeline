@@ -1,5 +1,5 @@
 import { createTheme } from "@mui/material/styles";
-import type {} from '@mui/lab/themeAugmentation';
+import type {} from "@mui/lab/themeAugmentation";
 
 const colors = {
   rose: "#f43f5e",
@@ -33,32 +33,32 @@ export const theme = createTheme({
   components: {
     // 1. CONFIGURACIÓN GLOBAL DE BOTONES
     // Esto asegura que TODOS tus botones tengan la fuente y forma que quieres
-     MuiTimelineItem: {
+    MuiTimelineItem: {
       styleOverrides: {
-       root: {
-          '&::before': {
+        root: {
+          "&::before": {
             // Esto elimina el espacio fantasma a la izquierda en móvil
-            '@media (max-width:600px)': {
-              display: 'none', 
+            "@media (max-width:600px)": {
+              display: "none",
             },
           },
         },
       },
     },
-            
-              // 2. CONFIGURACIÓN DE LOS CONTENIDOS DE LA CARD
 
-            MuiTimelineContent: {
+    // 2. CONFIGURACIÓN DE LOS CONTENIDOS DE LA CARD
+
+    MuiTimelineContent: {
       styleOverrides: {
         root: {
-          '@media (max-width:600px)': {
-            paddingLeft: '16px', // Espacio consistente entre la línea y la card
-            paddingRight: '0px',
+          "@media (max-width:600px)": {
+            paddingLeft: "16px", // Espacio consistente entre la línea y la card
+            paddingRight: "0px",
           },
         },
       },
     },
-  
+
     MuiButton: {
       styleOverrides: {
         root: {
@@ -71,13 +71,16 @@ export const theme = createTheme({
         },
       },
     },
-   
 
     MuiCssBaseline: {
       styleOverrides: {
         body: {
           background: "radial-gradient(circle, #ffffff 0%, #fff5f7 100%)",
           backgroundAttachment: "fixed",
+          "@keyframes patternDrift": {
+            "0%": { backgroundPosition: "0px 0px" },
+            "100%": { backgroundPosition: "600px 600px" },
+          },
         },
         ".final-message-card": {
           background: "rgba(255, 255, 255, 0.98) !important",
@@ -106,7 +109,6 @@ export const theme = createTheme({
           background: "linear-gradient(90deg, #6366f1, #f43f5e) !important",
           WebkitBackgroundClip: "text !important",
           WebkitTextFillColor: "transparent !important",
-          
         },
         ".timeline-subtitle": {
           textAlign: "center !important",
@@ -116,7 +118,6 @@ export const theme = createTheme({
           fontWeight: "500 !important",
           fontSize: "0.8rem !important",
         },
-       
 
         // --- ESTILOS DE CARD ---
         ".moment-card": {
@@ -188,6 +189,40 @@ export const theme = createTheme({
             boxShadow: "0 6px 20px rgba(244, 63, 94, 0.15)",
           },
         },
+        // Mejora del scroll en móvil
+        "html, body": {
+          scrollBehavior: "smooth",
+          WebkitOverflowScrolling: "touch", // Scroll con inercia en iOS
+        },
+
+        // Cards más compactas en móvil
+        "@media (max-width: 600px)": {
+          ".moment-card": {
+            borderRadius: "16px !important",
+            marginBottom: "16px !important",
+          },
+          ".moment-card .MuiCardContent-root": {
+            padding: "16px !important",
+          },
+        },
+
+        // Mejorar el tamaño del Tilt en móvil (deshabilitar en táctil)
+        "@media (hover: none)": {
+          // En dispositivos táctiles el tilt puede ser incómodo, lo neutralizamos
+          ".react-parallax-tilt": {
+            transform: "none !important",
+          },
+        },
+
+        // Botón de música en móvil
+        // "@media (max-width: 600px)": {
+        //  ".music-btn": {
+        //  bottom: "16px !important",
+        //   right: "16px !important",
+        //  width: "40px !important",
+        //  height: "40px !important",
+        // },
+        // },
       },
     },
   },
