@@ -119,7 +119,7 @@ export const TimelineSection = () => {
                                             exit={{ opacity: 0, y: -20, scale: 0.95 }}
                                             transition={{ duration: 1.2, ease: 'easeOut' }}
                                             onViewportEnter={() => {
-                                                setTimeout(() => setQuestionState('final'), 400); 
+                                                setTimeout(() => setQuestionState('final'), 4000); 
                                             }}
                                             style={{ textAlign: 'center' }}
                                         >
