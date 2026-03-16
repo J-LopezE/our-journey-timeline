@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Typography, Skeleton, useMediaQuery, useTheme } from '@mui/material';
+import { Container, Typography, Skeleton, useMediaQuery, useTheme, Box } from '@mui/material';
 import {
     Timeline,
     TimelineItem,
@@ -10,11 +10,12 @@ import {
     TimelineOppositeContent,
 } from '@mui/lab';
 import type { TimelineProps } from '@mui/lab';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MomentCard } from '../moments/MomentCard';
 import { myMoments } from '../../data/momentsData';
 import { FinalMessage } from './FinalMessage';
 import { MomentSkeleton } from '../moments/MomentSkeleton';
+import { DecisionCard } from './DecisionCard';
 
 
 export const TimelineSection = () => {
@@ -23,9 +24,10 @@ export const TimelineSection = () => {
     const theme = useTheme();
     // Esto será true si la pantalla es menor a 600px (sm)
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [questionState, setQuestionState] = useState<'question' | 'final' | 'decision'>('question');
     useEffect(() => {
         // Simulamos un pequeño delay para que el usuario vea la elegancia del Skeleton
-        const timer = setTimeout(() => setIsLoading(false), 1500);
+        const timer = setTimeout(() => setIsLoading(false), 500);
         return () => clearTimeout(timer);
     }, []);
 
@@ -70,7 +72,27 @@ export const TimelineSection = () => {
                                     {isLoading ? (
                                         <MomentSkeleton />
                                     ) : (
-                                        <MomentCard moment={moment} index={index} />
+                                        <>
+                                            {/* Fecha flotante — solo visible en móvil */}
+                                            {isMobile && (
+                                                <Typography
+                                                    variant="caption"
+                                                    sx={{
+                                                        display: 'block',
+                                                        color: 'text.secondary',
+                                                        fontWeight: 600,
+                                                        letterSpacing: '0.05em',
+                                                        mb: 0.8,
+                                                        ml: 0.5,
+                                                        fontSize: '0.72rem',
+                                                        textTransform: 'uppercase',
+                                                    }}
+                                                >
+                                                    {moment.date}
+                                                </Typography>
+                                            )}
+                                            <MomentCard moment={moment} index={index} />
+                                        </>
                                     )}
                                 </TimelineContent>
                             </TimelineItem>
@@ -85,29 +107,126 @@ export const TimelineSection = () => {
                                 {/* Quitamos el conector aquí para que la pregunta flote */}
                             </TimelineSeparator>
 
-                            <TimelineContent sx={{ py: 10 }}>
-                                {/* 1. LA PREGUNTA (PUENTE) */}
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 1.8 }}
-                                >
-                                    <Typography
-                                        variant="h4"
-                                        sx={{
-                                            fontWeight: 300,
-                                            fontStyle: 'italic',
-                                            color: '#64748b',
-                                            fontFamily: "'Playfair Display', serif",
-                                            textAlign: 'center',
-                                            mb: 6
-                                        }}
-                                    >
-                                        ¿Continuará...?
-                                    </Typography>
-                                </motion.div>
-                                <FinalMessage />
+                            <TimelineContent sx={{ py: 10, minHeight: '300px' }}>
+                                <AnimatePresence mode="wait">
+
+                                    {/* ── FASE 1: ¿Continuará...? — timer 6s ── */}
+                                    {questionState === 'question' && (
+                                        <motion.div
+                                            key="question"
+                                            initial={{ opacity: 0, y: 30 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                                            transition={{ duration: 1.2, ease: 'easeOut' }}
+                                            onViewportEnter={() => {
+                                                setTimeout(() => setQuestionState('final'), 6000); // ← 6 segundos
+                                            }}
+                                            style={{ textAlign: 'center' }}
+                                        >
+                                            <Typography
+                                                variant="h4"
+                                                sx={{
+                                                    fontWeight: 300,
+                                                    fontStyle: 'italic',
+                                                    color: '#64748b',
+                                                    fontFamily: "'Playfair Display', serif",
+                                                    textAlign: 'center',
+                                                    mb: 3,
+                                                    fontSize: { xs: '1.8rem', md: '2.5rem' }
+                                                }}
+                                            >
+                                                ¿Continuará...?
+                                            </Typography>
+
+                                            {/* Barra de progreso sutil — indica visualmente que algo viene */}
+                                            <Box sx={{ width: '80px', mx: 'auto', mt: 2 }}>
+                                                <motion.div
+                                                    initial={{ scaleX: 0 }}
+                                                    animate={{ scaleX: 1 }}
+                                                    transition={{ duration: 6, ease: 'linear' }} // ← misma duración que el timer
+                                                    style={{
+                                                        height: '2px',
+                                                        background: 'linear-gradient(90deg, #6366f1, #f43f5e)',
+                                                        borderRadius: '2px',
+                                                        transformOrigin: 'left',
+                                                    }}
+                                                />
+                                            </Box>
+                                        </motion.div>
+                                    )}
+
+                                    {/* ── FASE 2: Mensaje final — botón Continuar controlado por usuario ── */}
+                                    {questionState === 'final' && (
+                                        <motion.div
+                                            key="final"
+                                            initial={{ opacity: 0, y: 40 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -30, scale: 0.95 }}
+                                            transition={{ duration: 1.2, ease: 'easeOut' }}
+                                        >
+                                            <FinalMessage />
+
+                                            {/* Botón Continuar — aparece 1.5s después para que el usuario empiece a leer primero */}
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 1.5, duration: 0.8 }}
+                                                style={{ textAlign: 'center', marginTop: '32px' }}
+                                            >
+                                                <Box
+                                                    onClick={() => setQuestionState('decision')}
+                                                    sx={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: 1,
+                                                        px: 4,
+                                                        py: 1.2,
+                                                        borderRadius: '50px',
+                                                        border: '1px solid rgba(244,63,94,0.3)',
+                                                        color: '#f43f5e',
+                                                        fontSize: '0.95rem',
+                                                        fontFamily: "'Playfair Display', serif",
+                                                        fontStyle: 'italic',
+                                                        cursor: 'pointer',
+                                                        background: 'rgba(255,255,255,0.7)',
+                                                        backdropFilter: 'blur(10px)',
+                                                        transition: 'all 0.3s ease',
+                                                        userSelect: 'none',
+                                                        '&:hover': {
+                                                            background: 'rgba(244,63,94,0.05)',
+                                                            border: '1px solid rgba(244,63,94,0.6)',
+                                                            transform: 'translateY(-2px)',
+                                                            boxShadow: '0 8px 20px rgba(244,63,94,0.15)',
+                                                        }
+                                                    }}
+                                                >
+                                                    Continuar
+                                                    {/* Flecha animada → */}
+                                                    <motion.span
+                                                        animate={{ x: [0, 4, 0] }}
+                                                        transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+                                                        style={{ display: 'inline-block' }}
+                                                    >
+                                                        →
+                                                    </motion.span>
+                                                </Box>
+                                            </motion.div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* ── FASE 3: Card Sí/No — aparece y se queda ── */}
+                                    {questionState === 'decision' && (
+                                        <motion.div
+                                            key="decision"
+                                            initial={{ opacity: 0, scale: 0.85, y: 50 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+                                        >
+                                            <DecisionCard />
+                                        </motion.div>
+                                    )}
+
+                                </AnimatePresence>
                             </TimelineContent>
                         </TimelineItem>
                     </Timeline>
