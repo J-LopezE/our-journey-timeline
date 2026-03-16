@@ -33,8 +33,10 @@ export const BackgroundParticles = () => {
                         straight: false,
                         outModes: { default: "out" },
                     },
-                    number: { density: { enable: true, area: 800 }, value: 40 },
-                    opacity: { value: 0.2 },
+                    number: {
+                        density: { enable: true, area: 800 },
+                        value: window.innerWidth < 600 ? 20 : 40 // ← Mitad de partículas en móvil
+                    }, opacity: { value: 0.2 },
                     shape: { type: "circle" },
                     size: { value: { min: 1, max: 3 } },
                 },
